@@ -2,9 +2,38 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Button, Grid, Link, TextField, Typography } from '@mui/material';
 import { Google } from '@mui/icons-material';
 import { AuthLayout } from '../layout/AuthLayout';
+import { useForm } from '../../hooks';
+import { checkingAuthentication, startGoogleSignIn } from '../../store/auth/thunks';
+import { useDispatch, useSelector } from 'react-redux';
+import { useMemo } from 'react';
 
 
 export const LoginPage = () => {
+
+  const {} = useSelector( state => state.auth );
+
+  const dispatch = useDispatch();
+
+  
+  const {email, password, onInputChange, formState } = useForm({
+    email: 'yZk6H@example.com',
+    password: '123456'
+  });
+
+  const isAuthenticating = useMemo(() => status === 'checking', [status])
+
+  const onSubmit = (event) => {
+    event.preventDefault();
+    console.log({ email, password });
+    dispatch( checkingAuthentication() );
+  }
+
+  const onGoogleSignIn = () => {
+
+    dispatch( startGoogleSignIn() );
+  }
+
+
   return (
     <AuthLayout title="Login">
       <form>
@@ -15,6 +44,9 @@ export const LoginPage = () => {
                 type="email" 
                 placeholder='correo@google.com' 
                 fullWidth
+                name='email'
+                value={ email }
+                onChange={ onInputChange }
               />
             </Grid>
 
@@ -24,6 +56,9 @@ export const LoginPage = () => {
                 type="password" 
                 placeholder='Contraseña' 
                 fullWidth
+                name='password '
+                value={ password }
+                onChange={ onInputChange }
               />
             </Grid>
             
@@ -34,7 +69,11 @@ export const LoginPage = () => {
                 </Button>
               </Grid>
               <Grid item xs={ 12 } sm={ 6 }>
-                <Button variant='contained' fullWidth>
+                <Button 
+                  disabled={ isAuthenticating }
+                  onClick={ onGoogleSignIn } 
+                  variant='contained' 
+                  fullWidth>
                   <Google />
                   <Typography sx={{ ml: 1 }}>Google</Typography>
                 </Button>
